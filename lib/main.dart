@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:manga_tracking_app/views/home_screen.dart';
+import 'package:manga_tracking_app/views/home.dart';
 
+//Main Method
 void main() {
   runApp(const MainApp());
 }
@@ -8,6 +9,7 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
+  //Initial build for main homescreen
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,12 +22,11 @@ class MainApp extends StatelessWidget {
   }
 }
 
-//Different themes for the application
-
+//Different themes for the application for light and dark
 final _lightTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     brightness: Brightness.light,
-    seedColor: const Color.fromARGB(255, 231, 133, 87),
+    seedColor: const Color.fromARGB(255, 87, 231, 176),
   ),
   useMaterial3: true,
 );
@@ -33,7 +34,7 @@ final _lightTheme = ThemeData(
 final _darkTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     brightness: Brightness.dark,
-    seedColor: const Color.fromARGB(255, 153, 15, 15),
+    seedColor: const Color.fromARGB(255, 30, 167, 132),
   ),
   useMaterial3: true,
 );
