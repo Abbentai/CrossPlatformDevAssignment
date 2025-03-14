@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manga_tracking_app/views/viewbook.dart';
 
 class MangaCard extends StatelessWidget {
   const MangaCard({super.key, required this.name, required this.imageURL});
@@ -6,13 +7,18 @@ class MangaCard extends StatelessWidget {
   final String name;
   final String imageURL;
 
+    void _viewBook(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (ctx) => Viewbook()));
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return InkWell(
-        onTap: () {},
-        splashColor: Theme.of(context).colorScheme.tertiary,
+        onTap: () => _viewBook(context),
+        splashColor: Theme.of(context).primaryColor,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         child: Container(
             decoration: BoxDecoration(
@@ -30,7 +36,6 @@ class MangaCard extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Container(
                   height: 80,
-                  width: 200,
                   decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       gradient: LinearGradient(
@@ -48,7 +53,7 @@ class MangaCard extends StatelessWidget {
                           .textTheme
                           .titleSmall!
                           .copyWith(color: Colors.white),
-                          textAlign: TextAlign.center,
+                      textAlign: TextAlign.center,
                     ),
                   )),
             )));

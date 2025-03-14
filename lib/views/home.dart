@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:manga_tracking_app/views/form.dart';
+import 'package:manga_tracking_app/views/viewbook.dart';
 import 'package:manga_tracking_app/widgets/manga_card.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   //Used to navigate to form screen
   void _creationForm(BuildContext context) {
     Navigator.of(context)
