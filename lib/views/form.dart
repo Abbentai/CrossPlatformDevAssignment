@@ -69,7 +69,7 @@ class _NewBookState extends State<FormScreen> {
                         //Title Field
                         TextFormField(
                           decoration: const InputDecoration(
-                            label: Text('Title'),
+                            label: Text('Title *'),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -83,7 +83,7 @@ class _NewBookState extends State<FormScreen> {
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
-                            label: Text('Author'),
+                            label: Text('Author *'),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -104,7 +104,7 @@ class _NewBookState extends State<FormScreen> {
                               child: TextFormField(
                                 keyboardType: TextInputType.number,
                                 decoration: const InputDecoration(
-                                  label: Text('Vol No.'),
+                                  label: Text('Vol No. *'),
                                 ),
                                 initialValue: '1',
                                 validator: (value) {
@@ -127,7 +127,7 @@ class _NewBookState extends State<FormScreen> {
                               child: TextFormField(
                                 keyboardType: TextInputType.number,
                                 decoration: const InputDecoration(
-                                  label: Text('ISBN'),
+                                  label: Text('ISBN *'),
                                 ),
                                 validator: (value) {
                                   if (value == null ||
@@ -161,7 +161,7 @@ class _NewBookState extends State<FormScreen> {
                                 : '',
                           ),
                           decoration: const InputDecoration(
-                            labelText: 'Date',
+                            labelText: 'Date *',
                             suffixIcon: Icon(Icons.calendar_today),
                           ),
                           onTap: () async {
@@ -191,7 +191,7 @@ class _NewBookState extends State<FormScreen> {
 
                         TextFormField(
                           decoration: const InputDecoration(
-                            label: Text('Demographic'),
+                            label: Text('Demographic *'),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -206,7 +206,7 @@ class _NewBookState extends State<FormScreen> {
 
                         TextFormField(
                           decoration: const InputDecoration(
-                            label: Text('Publisher'),
+                            label: Text('Publisher *'),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
