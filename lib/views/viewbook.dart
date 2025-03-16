@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Viewbook extends StatelessWidget {
+  const Viewbook({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

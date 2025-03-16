@@ -1,6 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:manga_tracking_app/model/book.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({super.key});
@@ -12,7 +18,10 @@ class FormScreen extends StatefulWidget {
 }
 
 class _NewBookState extends State<FormScreen> {
+  //Db reference and formKey for the state of the form
   final _formKey = GlobalKey<FormState>();
+
+  //vars for storing input
   var _title = '';
   var _volumeNum = 1;
   var _author = '';
@@ -20,22 +29,95 @@ class _NewBookState extends State<FormScreen> {
   var _date = DateTime.now();
   var _demographic = '';
   var _publisher = '';
-  var _chapters;
-  var _pages;
-  File? _image;
+  var _chapters = 1;
+  var _pages = 0;
+  var _image;
 
   var isSendingData = false;
 
   //Future method which brings up the camera functionality and saves it as a File
   Future _pickImageFromCamera() async {
-    final returnedImage =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    final returnedImage = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      imageQuality: 40,
+    );
 
     if (returnedImage == null) return;
 
     setState(() {
       _image = File(returnedImage.path);
     });
+  }
+
+  //Async method which
+  void _saveBook() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        _formKey.currentState!.save();
+
+        setState(() {
+          isSendingData = true;
+        });
+
+        // await Firebase.initializeApp();
+        String? base64Image = "test";
+        if (_image != null){
+          List<int> imageBytes = await _image!.readAsBytes();
+          base64Image = base64Encode(imageBytes);
+        } else {
+          base64Image = "";
+        }
+
+        final url = Uri.https(
+            "mangatrackercpdassignment-default-rtdb.europe-west1.firebasedatabase.app",
+            'book-list.json');
+
+        final response = await http.post(url,
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({
+              'title': _title,
+              'volumeNum': _volumeNum,
+              'author': _author,
+              'isbn': _isbn,
+              'date': _date.toIso8601String(),
+              'demographic': _demographic,
+              'publisher': _publisher,
+              'chapters': _chapters,
+              'pages': _pages,
+              'image': base64Image,
+            }));
+
+        print(response.statusCode);
+        print(response.body);
+
+        Map<String, dynamic> responseData = json.decode(response.body);
+
+        if ((!context.mounted)) {
+          return;
+        }
+
+        Navigator.of(context).pop(Book(
+            id: 'testidfk${DateTime.now()}',
+            title: _title,
+            volumeNum: _volumeNum,
+            author: _author,
+            isbn: _isbn,
+            date: _date,
+            demographic: _demographic,
+            publisher: _publisher,
+            chapters: _chapters,
+            pages: _pages,
+            image: base64Image));
+      } catch (e) {
+        setState(() {
+          isSendingData = false;
+        });
+        print("Error uploading book: $e");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("Error uploading book: $e")),
+        // );
+      }
+    }
   }
 
   @override
@@ -135,7 +217,7 @@ class _NewBookState extends State<FormScreen> {
                                       int.tryParse(value) == null ||
                                       int.tryParse(value)! <= 0) {
                                     return 'An ISBN must be entered';
-                                  } else if (value.length != 10 ||
+                                  } else if (value.length != 10 &&
                                       value.length != 13) {
                                     return 'An ISBN must be 10 or 13 digits long';
                                   }
@@ -143,7 +225,7 @@ class _NewBookState extends State<FormScreen> {
                                   return null;
                                 },
                                 onSaved: (value) {
-                                  _isbn = int.parse(value!);
+                                  _isbn = value!;
                                 },
                               ),
                             ),
@@ -161,7 +243,7 @@ class _NewBookState extends State<FormScreen> {
                                 : '',
                           ),
                           decoration: const InputDecoration(
-                            labelText: 'Date *',
+                            labelText: 'Date Released *',
                             suffixIcon: Icon(Icons.calendar_today),
                           ),
                           onTap: () async {
@@ -218,7 +300,6 @@ class _NewBookState extends State<FormScreen> {
                             _publisher = value!;
                           },
                         ),
-
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -227,8 +308,16 @@ class _NewBookState extends State<FormScreen> {
                               child: TextFormField(
                                 keyboardType: TextInputType.number,
                                 decoration: const InputDecoration(
-                                  label: Text('Chapters'),
+                                  label: Text('Chapters *'),
                                 ),
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.isEmpty ||
+                                      int.tryParse(value) == null) {
+                                    return 'Amount of chapters is required';
+                                  }
+                                  return null;
+                                },
                                 onSaved: (value) {
                                   _chapters = int.parse(value!);
                                 },
@@ -241,8 +330,16 @@ class _NewBookState extends State<FormScreen> {
                               child: TextFormField(
                                 keyboardType: TextInputType.number,
                                 decoration: const InputDecoration(
-                                  label: Text('Pages'),
+                                  label: Text('Pages *'),
                                 ),
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.isEmpty ||
+                                      int.tryParse(value) == null) {
+                                    return 'Amount of pages is required';
+                                  }
+                                  return null;
+                                },
                                 onSaved: (value) {
                                   _pages = int.parse(value!);
                                 },
@@ -305,7 +402,7 @@ class _NewBookState extends State<FormScreen> {
                                 },
                                 child: const Text('Reset')),
                             ElevatedButton(
-                                onPressed: () {},
+                                onPressed: _saveBook,
                                 child: isSendingData
                                     ? const SizedBox(
                                         width: 16,

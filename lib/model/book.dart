@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class Book {
   const Book({
     required this.id,
@@ -14,17 +12,16 @@ class Book {
     this.pages,
     this.image,
   });
-  
+
   final String id;
   final String title;
-  final Int volumeNum;
+  final int volumeNum;
   final String author;
-  final Int isbn;
+  final String isbn;
   final DateTime date;
   final String demographic;
   final String publisher;
-  final Int? chapters;
-  final Int? pages;
+  final int? chapters;
+  final int? pages;
   final String? image;
-  
 }

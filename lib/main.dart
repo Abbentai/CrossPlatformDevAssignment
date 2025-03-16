@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:manga_tracking_app/views/home.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 
+
 //Main Method
-void main() {
+void main() async{
   runApp(MainApp());
 }
 

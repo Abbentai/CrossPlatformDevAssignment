@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "356353397492",
+    "firebase_url": "https://mangatrackercpdassignment-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "mangatrackercpdassignment",
+    "storage_bucket": "mangatrackercpdassignment.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356353397492:android:518a215a8149f4850444a1",
+        "android_client_info": {
+          "package_name": "com.example.manga_tracking_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPH0NwaCmsYlPdDNZRGQ1G6rSq54pyDnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
