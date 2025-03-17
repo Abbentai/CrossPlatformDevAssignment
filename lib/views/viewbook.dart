@@ -24,8 +24,11 @@ class Viewbook extends StatelessWidget {
         debugPrint("Error decoding base64 image: $e");
         imageBytes = null;
       }
+    } else {
+      imageBytes = null;
     }
 
+    //Shows a notification that notifies the user that a book has been deleted, configured specifically for android in this case
     void showNotification() async {
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
           FlutterLocalNotificationsPlugin();
@@ -39,9 +42,10 @@ class Viewbook extends StatelessWidget {
       );
 
       await flutterLocalNotificationsPlugin.show(
-          0, 'Book has been deleted', '', platformChannelSpecifics);
+          0, 'A Manga has been deleted', '', platformChannelSpecifics);
     }
 
+    //Deletes a book from the realtime database via its ID via a delete request
     void deleteFromID(String bookId) async {
       try {
         isSendingData = true;
@@ -55,6 +59,8 @@ class Viewbook extends StatelessWidget {
 
         if (response.statusCode == 200) {
           if (!context.mounted) return;
+          showNotification();
+          Navigator.of(context).pop(true);
           Navigator.of(context).pop(true);
         } else {
           throw Exception("Failed to delete book");
@@ -63,6 +69,41 @@ class Viewbook extends StatelessWidget {
         print("Error deleting book: $e");
         isSendingData = false;
       }
+    }
+
+    //Shows an alert dialogue to a user before deleting a manga
+    Future<void> _showMyDialog() async {
+      return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirm Delete'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(
+                      'Are you sure you want to delete the manga${book.title}?'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.inversePrimary,
+                  ),
+                  child: const Text('Delete'),
+                  onPressed: () => deleteFromID(book.id)),
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
 
     return Scaffold(
@@ -81,28 +122,48 @@ class Viewbook extends StatelessWidget {
                 builder: (_, constraints) => Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Image container with proper sizing
-                    SizedBox(
-                      width: constraints.maxWidth * 0.5,
-                      height: 300,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (isImageLoading)
-                              const CircularProgressIndicator(),
-                            if (imageBytes != null)
-                              Image.memory(
+                    //If its not null continuosly load until the image overlaps the circular progress indicator in the stack
+                    if (imageBytes != null)
+                      Stack(
+                        children: [
+                          Positioned.fill(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          SizedBox(
+                            width: constraints.maxWidth * 0.5,
+                            height: 300,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.memory(
                                 imageBytes,
                                 width: constraints.maxWidth * 0.5,
                                 height: 300,
                                 fit: BoxFit.cover,
                               ),
-                          ],
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      SizedBox(
+                        width: constraints.maxWidth * 0.5,
+                        height: 300,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            color: isDarkMode
+                                ? Theme.of(context).colorScheme.onSecondary
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer, // Placeholder color
+                            child: Icon(Icons.image_not_supported,
+                                size: 50, color: Colors.grey),
+                          ),
                         ),
                       ),
-                    ),
                     SizedBox(width: constraints.maxWidth * 0.04),
                     Container(
                       padding: EdgeInsets.all(constraints.maxWidth * 0.05),
@@ -290,14 +351,34 @@ class Viewbook extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 20),
               ElevatedButton(
-                  onPressed: () => deleteFromID(book.id),
+                onPressed: () => _showMyDialog(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.error, // Danger color
+                  minimumSize:
+                      const Size(150, 50), // Larger size (adjust as needed)
+                  shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(8)), //Optional: rounded corners
+                ),
+                child: Center(
                   child: isSendingData
                       ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator())
-                      : const Text('Delete'))
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          'Delete',
+                          style: TextStyle(fontSize: 18, color: Colors.black),
+                        ),
+                ),
+              )
             ],
           ),
         ),

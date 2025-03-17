@@ -16,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _bookGridState extends State<HomeScreen> {
   List<Book> _books = [];
+  bool noManga = false;
   bool isLoading = true;
 
   @override
@@ -31,48 +32,68 @@ class _bookGridState extends State<HomeScreen> {
   }
 
   Future _loadItems() async {
-    final url = Uri.https(
-        "mangatrackercpdassignment-default-rtdb.europe-west1.firebasedatabase.app",
-        'book-list.json');
-    final response = await http.get(url);
+    try {
+      final url = Uri.https(
+          "mangatrackercpdassignment-default-rtdb.europe-west1.firebasedatabase.app",
+          'book-list.json');
+      final response = await http.get(url);
 
-    final List<Book> loadedList = [];
+      final List<Book> loadedList = [];
 
-    final Map<String, dynamic> firebaseData = json.decode(response.body);
+      if (response.body == "null") {
+        //If null noManga is set to true to show the proper indicator
+        setState(() {
+          _books = [];
+          noManga = true;
+          isLoading = false;
+        });
+        return;
+      }
 
-    for (final item in firebaseData.entries) {
-      loadedList.add(Book(
-        id: item.key,
-        title: item.value["title"],
-        volumeNum: item.value["volumeNum"],
-        author: item.value["author"],
-        isbn: item.value["isbn"],
-        date: DateTime.parse(item.value["date"]),
-        demographic: item.value["demographic"],
-        publisher: item.value["publisher"],
-        chapters: item.value["chapters"],
-        pages: item.value["pages"],
-        image: item.value["image"],
-      ));
+      final Map<String, dynamic> firebaseData = json.decode(response.body);
+
+      for (final item in firebaseData.entries) {
+        loadedList.add(Book(
+          id: item.key,
+          title: item.value["title"],
+          volumeNum: item.value["volumeNum"],
+          author: item.value["author"],
+          isbn: item.value["isbn"],
+          date: DateTime.parse(item.value["date"]),
+          demographic: item.value["demographic"],
+          publisher: item.value["publisher"],
+          chapters: item.value["chapters"],
+          pages: item.value["pages"],
+          image: item.value["image"],
+        ));
+      }
+
+      setState(() {
+        _books = loadedList;
+        noManga = _books.isEmpty;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Error loading manga cards $e");
+      noManga = true;
+      isLoading = false;
     }
-
-    setState(() {
-      _books = loadedList;
-    });
   }
 
   void _creationForm(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (ctx) => FormScreen()));
 
-         _loadItems();
+    _loadItems();
   }
 
   void _viewBook(BuildContext context, Book book) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (ctx) => Viewbook(book: book,)));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (ctx) => Viewbook(
+              book: book,
+            )));
 
-         _loadItems();
+    _loadItems();
   }
 
   @override
@@ -81,7 +102,25 @@ class _bookGridState extends State<HomeScreen> {
       child: Text('No Manga currently logged'),
     );
 
-    if (isLoading) {
+    if (noManga) {
+      content = RefreshIndicator(
+        onRefresh: _loadItems,
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height *
+                0.7, // Adjust for centering
+            child: Center(
+              child: Text(
+                "No Manga currently logged, \nUse the FAB at the bottom to add one!",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ),
+        ),
+      );
+    } else if (isLoading) {
       content = const Center(
         child: CircularProgressIndicator(),
       );

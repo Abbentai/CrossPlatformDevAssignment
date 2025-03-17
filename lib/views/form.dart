@@ -58,11 +58,7 @@ class _NewBookState extends State<FormScreen> {
     );
 
     await flutterLocalNotificationsPlugin.show(
-      0,
-      '',
-      'The manga $_title has been added',
-      platformChannelSpecifics
-    );
+        0, '', 'The manga $_title has been added', platformChannelSpecifics);
   }
 
   //Async method which
@@ -420,6 +416,11 @@ class _NewBookState extends State<FormScreen> {
                                 },
                                 child: const Text('Reset')),
                             ElevatedButton(
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .inversePrimary,
+                                ),
                                 onPressed: _saveBook,
                                 child: isSendingData
                                     ? const SizedBox(
