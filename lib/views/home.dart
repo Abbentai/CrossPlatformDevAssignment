@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:manga_tracking_app/model/book.dart';
 import 'package:manga_tracking_app/views/form.dart';
+import 'package:manga_tracking_app/views/viewbook.dart';
 import 'package:manga_tracking_app/widgets/manga_card.dart';
 import 'package:http/http.dart' as http;
 
@@ -63,6 +64,15 @@ class _bookGridState extends State<HomeScreen> {
   void _creationForm(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (ctx) => FormScreen()));
+
+         _loadItems();
+  }
+
+  void _viewBook(BuildContext context, Book book) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (ctx) => Viewbook(book: book,)));
+
+         _loadItems();
   }
 
   @override
@@ -78,6 +88,7 @@ class _bookGridState extends State<HomeScreen> {
     }
 
     if (_books.isNotEmpty) {
+      //content is now seperate due to the refresh indicator, also helps split the application more modularly
       content = RefreshIndicator(
           onRefresh: _loadItems,
           child: Center(
@@ -89,23 +100,14 @@ class _bookGridState extends State<HomeScreen> {
               crossAxisSpacing: 15,
               childAspectRatio: 5 / 8,
             ),
-
-            //These are temporarily just loaded via parameters for now with discord image links, these will eventually images store locally taken from the camera
             children: [
               for (final book in _books)
                 MangaCard(
                   name: book.title,
-                  image: book.image, // Assuming book.image holds the image URL
-                  onTap: () {
-                    () {};
-                  },
+                  image: book.image,
+                  volumeNum: book.volumeNum,
+                  viewBook: () => _viewBook(context, book),
                 ),
-
-              // MangaCard(
-              //   name: "FullMetal Alchemist Vol. 1",
-              //   imageURL:
-              //       'https://cdn.discordapp.com/attachments/758289671591034910/1349865020158119996/PXL_20250313_220130992.jpg?ex=67d4a744&is=67d355c4&hm=510d0bdd6d3e559ae776b7fe9d3dbd06ed74e34163cfaa2ce2208625a06aa0ab&',
-              // ),
             ],
           )));
     }

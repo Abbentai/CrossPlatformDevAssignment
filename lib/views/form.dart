@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:manga_tracking_app/model/book.dart';
@@ -49,6 +47,24 @@ class _NewBookState extends State<FormScreen> {
     });
   }
 
+  void showNotification() async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your_channel_id', 'your_channel_name',
+        importance: Importance.max, priority: Priority.high, ticker: 'ticker');
+    var platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      '',
+      'The manga $_title has been added',
+      platformChannelSpecifics
+    );
+  }
+
   //Async method which
   void _saveBook() async {
     if (_formKey.currentState!.validate()) {
@@ -61,7 +77,7 @@ class _NewBookState extends State<FormScreen> {
 
         // await Firebase.initializeApp();
         String? base64Image = "test";
-        if (_image != null){
+        if (_image != null) {
           List<int> imageBytes = await _image!.readAsBytes();
           base64Image = base64Encode(imageBytes);
         } else {
@@ -95,6 +111,8 @@ class _NewBookState extends State<FormScreen> {
         if ((!context.mounted)) {
           return;
         }
+
+        showNotification();
 
         Navigator.of(context).pop(Book(
             id: 'testidfk${DateTime.now()}',

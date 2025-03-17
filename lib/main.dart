@@ -1,17 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:manga_tracking_app/views/home.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 
-
 //Main Method
-void main() async{
+void main() async {
   runApp(MainApp());
 }
 
-class MainApp extends StatelessWidget {
-  MainApp({super.key});
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
 
   //Initial build for main homescreen
+  @override
+  _MainAppState createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  //initialisation for notifications
+  @override
+  void initState() {
+    super.initState();
+    var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     //DynamicColorBuilder is used for Material You themeing within the app
@@ -21,7 +39,7 @@ class MainApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Manga Tracker App',
           theme: ThemeData(
-            // The question marks indicate that if the device running the app doesn't support dynamic theming, it will 
+            // The question marks indicate that if the device running the app doesn't support dynamic theming, it will
             // fall back to the light and dark themes written below
             colorScheme: lightDynamic ?? _lightTheme.colorScheme,
             useMaterial3: true,
