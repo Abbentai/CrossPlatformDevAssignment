@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:manga_tracking_app/views/viewbook.dart';
 
 class MangaCard extends StatelessWidget {
   const MangaCard(

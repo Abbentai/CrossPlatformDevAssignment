@@ -102,7 +102,7 @@ class _NewBookState extends State<FormScreen> {
         print(response.statusCode);
         print(response.body);
 
-        Map<String, dynamic> responseData = json.decode(response.body);
+        json.decode(response.body);
 
         if ((!context.mounted)) {
           return;
@@ -252,6 +252,7 @@ class _NewBookState extends State<FormScreen> {
                         TextFormField(
                           //Controller is needed to update the text field with the parsed date
                           controller: TextEditingController(
+                            // ignore: unnecessary_null_comparison
                             text: _date != null
                                 ? "${_date.toLocal()}".split(' ')[0]
                                 : '',

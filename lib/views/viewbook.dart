@@ -82,7 +82,7 @@ class Viewbook extends StatelessWidget {
               child: ListBody(
                 children: <Widget>[
                   Text(
-                      'Are you sure you want to delete the manga${book.title}?'),
+                      'Are you sure you want to delete the manga ${book.title}?'),
                 ],
               ),
             ),
@@ -122,6 +122,7 @@ class Viewbook extends StatelessWidget {
                 builder: (_, constraints) => Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                     SizedBox(width: constraints.maxWidth * 0.005),
                     //If its not null continuosly load until the image overlaps the circular progress indicator in the stack
                     if (imageBytes != null)
                       Stack(
@@ -166,7 +167,7 @@ class Viewbook extends StatelessWidget {
                       ),
                     SizedBox(width: constraints.maxWidth * 0.04),
                     Container(
-                      padding: EdgeInsets.all(constraints.maxWidth * 0.05),
+                      padding: EdgeInsets.all(constraints.maxWidth * 0.02),
                       width: constraints.maxWidth * 0.45,
                       height: 300,
                       decoration: BoxDecoration(
@@ -277,7 +278,7 @@ class Viewbook extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(constraints.maxWidth * 0.05),
+                      padding: EdgeInsets.all(constraints.maxWidth * 0.02),
                       width: constraints.maxWidth,
                       height: 150,
                       decoration: BoxDecoration(

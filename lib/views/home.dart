@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:manga_tracking_app/main.dart';
 import 'package:manga_tracking_app/model/book.dart';
 import 'package:manga_tracking_app/views/form.dart';
 import 'package:manga_tracking_app/views/viewbook.dart';
@@ -14,7 +15,8 @@ class HomeScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _bookGridState();
 }
 
-class _bookGridState extends State<HomeScreen> {
+//RouteAware allows for events to happen
+class _bookGridState extends State<HomeScreen> with RouteAware {
   List<Book> _books = [];
   bool noManga = false;
   bool isLoading = true;
@@ -26,10 +28,21 @@ class _bookGridState extends State<HomeScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadItems();
-  }
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  routeObserver.subscribe(this, ModalRoute.of(context)!);
+}
+
+@override
+void dispose() {
+  routeObserver.unsubscribe(this);
+  super.dispose();
+}
+
+@override
+void didPopNext() {
+  _loadItems(); // Refresh the list when coming back
+}
 
   Future _loadItems() async {
     try {
@@ -98,6 +111,24 @@ class _bookGridState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //Depending on screenwidth change grid size
+    int calculateCrossAxisCount(double screenWidth) {
+      if (screenWidth > 1500) {
+        return 6; 
+      } else if (screenWidth > 1200) {
+        return 5;
+      } else if (screenWidth > 800) {
+        return 4; 
+      } else if (screenWidth > 600) {
+        return 3; 
+      } else {
+        return 2;
+      }
+    }
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = calculateCrossAxisCount(screenWidth);
+
     Widget content = const Center(
       child: Text('No Manga currently logged'),
     );
@@ -133,8 +164,8 @@ class _bookGridState extends State<HomeScreen> {
           child: Center(
               child: GridView(
             padding: EdgeInsets.all(20),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
               mainAxisSpacing: 15,
               crossAxisSpacing: 15,
               childAspectRatio: 5 / 8,

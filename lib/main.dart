@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:manga_tracking_app/views/home.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 //Main Method
 void main() async {
@@ -24,14 +28,22 @@ class _MainAppState extends State<MainApp> {
     var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid);
+    var initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    requestNotificationPermission();
   }
 
+  Future<void> requestNotificationPermission() async {
+    if (await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    //RouterObserver is for refreshing
     //DynamicColorBuilder is used for Material You themeing within the app
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
@@ -50,6 +62,7 @@ class _MainAppState extends State<MainApp> {
           ),
           themeMode: ThemeMode.system,
           home: HomeScreen(),
+          navigatorObservers: [routeObserver],
         );
       },
     );
